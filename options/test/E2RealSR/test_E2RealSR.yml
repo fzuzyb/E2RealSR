@@ -1,0 +1,93 @@
+name: E2RealSR
+model_type: SRGANDynamicModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+num_networks: 5
+
+datasets:
+  test_1:
+    name: DIV2K_bicubic
+    type: PairedImageDataset
+    dataroot_lq: /home/iv/Annotation/ZJJ/DASR/DASR-master/datasets/DIV2K_bicubic
+    dataroot_gt: /home/iv/Annotation/ZJJ/datasets/Testset/DIV2K_valid_HR
+    io_backend:
+      type: disk
+  test_2:
+    name: DIV2K_type1
+    type: PairedImageDataset
+    dataroot_lq: /home/iv/Annotation/ZJJ/DASR/DASR-master/datasets/DIV2K_type1
+    dataroot_gt: /home/iv/Annotation/ZJJ/datasets/Testset/DIV2K_valid_HR
+    io_backend:
+      type: disk
+  test_3:
+    name: DIV2K_type2
+    type: PairedImageDataset
+    dataroot_lq: /home/iv/Annotation/ZJJ/DASR/DASR-master/datasets/DIV2K_type2
+    dataroot_gt: /home/iv/Annotation/ZJJ/datasets/Testset/DIV2K_valid_HR
+    io_backend:
+      type: disk
+  test_4:
+    name: DIV2K_type3
+    type: PairedImageDataset
+    dataroot_lq: /home/iv/Annotation/ZJJ/DASR/DASR-master/datasets/DIV2K_type3
+    dataroot_gt: /home/iv/Annotation/ZJJ/datasets/Testset/DIV2K_valid_HR
+    io_backend:
+      type: disk
+#  test_5:
+#    name: Realworld38
+#    type: SingleImageDataset
+    ####### if you test RealWorld38 ,please not use metric
+    #######
+#    dataroot_lq: datasets/RealWorld38
+##    dataroot_gt: /home/iv/Annotation/ZJJ/datasets/Testset/DIV2K_valid_HR
+#    io_backend:
+#      type: disk
+#  test_6:
+#    name: DRealSR
+#    type: PairedImageDataset
+#    dataroot_lq: datasets/DRealSR/test_LR
+#    dataroot_gt: datasets/DRealSR/test_HR
+#    io_backend:
+#      type: disk
+network_g:
+#  type: MSRResNetDynamic
+#  num_in_ch: 3
+#  num_out_ch: 3
+#  num_feat: 64
+#  num_block: 16
+#  num_models: 5
+#  upscale: 4
+  type: E2RealSR
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  num_block: 5
+  num_group: 5
+  upscale: 4
+
+network_p:
+  type: ConvMixer
+  depth: 10
+  in_nc: 3
+  nf: 64
+  num_params: 33
+
+# path
+path:
+  pretrain_network_g: experiments/pretrained_models/net_g_100000.pth
+  pretrain_network_p: experiments/pretrained_models/net_p_100000.pth
+  param_key_g: params
+  strict_load_g: True
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: True
+    Lpips:
+      type: calculate_lpips
